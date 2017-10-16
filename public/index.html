@@ -3,10 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="./css/style.css"/>
 </head>
 <body>
-    <button onclick="sendMessage('I am a really cool robot, bitch!')">SEND</button>
-    <button onclick="setAllPrivate()"></button>
-    <script src="./bundle.js"></script>
+    <div id="p2p-app" class="container">
+        <div class="col-sm-10 col-md-8 col-md-offset-2 col-sm-offset-1 col-lg-6 col-lg-offset-3 frame">
+            <span class="glyphicon go-private" @click="switchP2P()" v-bind:class="{
+                    'glyphicon-check': private,
+                    'glyphicon-unchecked': !private,
+            }">p2p</span>
+            <ul>
+                <li style="width:100%" v-for="message in messages">
+                    <div class="macro" v-bind:class="{
+                            'msj': message.nick && message.self,
+                            'msj-rta': message.nick && !message.self,
+                            'msj-system': !message.nick,
+                        }">
+                        <div class="text">
+                            <p>{{ message.message }}</p>
+                            <p>
+                                <small class="nick">{{ message.nick }}</small>
+                                <small>{{ message.date | date}}</small>
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div>
+                <div class="macro send-area">
+                    <div class="text text-r" style="background:whitesmoke !important">
+                        <form @submit.prevent="sendMessage()">
+                            <input class="mytext" placeholder="Type a message" v-model="message"/>
+                        </form>
+                    </div>
+                    <button @click="sendMessage()" class="btn btn-default">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./js/bundle.js"></script>
 </body>
 </html>

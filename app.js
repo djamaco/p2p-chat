@@ -23,18 +23,17 @@ io.on('connection', socket => {
     console.log('socket ' + socket.id + ' has been connected');
     clients[socket.id] = socket;
 
-    socket.emit('socket connected', {message: 'socket connected with id ' + socket.id});
+    sendMessageToAll('socket connected', {message: 'socket connected with id ' + socket.id}, socket.id);
+    socket.emit('socket connected', {message: 'you connected with id ' + socket.id});
 
     socket.on('p2p-message', data => {
         console.log(socket.id, JSON.stringify(data, null, 2));
-        sendMessageToAll(data.message, socket.id);
+        data.message += ' <<Server read this!>>';
+        sendMessageToAll('p2p-message', data);
     });
 
     socket.on('set all private', () => {
-        _.forEach(clients, (socket, id) => {
-            socket.emit('p2p-private');
-            console.log(id + ' goes private connection');
-        });
+        sendMessageToAll('p2p-private');
     });
 
     socket.on('disconnect', () => {
@@ -50,10 +49,10 @@ http.listen(8080, (err) => {
     console.log('server created');
 });
 
-function sendMessageToAll(message, id) {
+function sendMessageToAll(message, data, exceptId) {
     _.forEach(clients, (socket, socketId) => {
-        if (socketId !== id) {
-            socket.emit('p2p-message', message);
+        if (socketId !== exceptId) {
+            socket.emit(message, data);
         }
     });
 }
